@@ -4,6 +4,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- A chat request with a wrong field type now says what to fix, such as `max_tokens must be an integer`, with `param` set to the field, instead of showing Go type names.
+
 ## [0.1.3] - 2026-11-05
 
 ### Added

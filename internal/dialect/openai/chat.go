@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/raven-clown/transponder/internal/schema"
@@ -48,6 +49,10 @@ func DecodeChatRequest(r io.Reader) (*schema.ChatRequest, error) {
 		if errors.As(err, &tooLarge) {
 			return nil, err
 		}
+		var typeErr *json.UnmarshalTypeError
+		if errors.As(err, &typeErr) {
+			return nil, wrongTypeError(typeErr)
+		}
 		return nil, &RequestError{Code: "invalid_json", Message: "the request body is not valid JSON: " + err.Error()}
 	}
 	if w.Model == "" {
@@ -82,6 +87,31 @@ func DecodeChatRequest(r io.Reader) (*schema.ChatRequest, error) {
 		req.Messages = append(req.Messages, schema.Message{Role: m.Role, Content: content})
 	}
 	return req, nil
+}
+
+// wrongTypeError words a JSON type mismatch without naming Go types.
+func wrongTypeError(e *json.UnmarshalTypeError) *RequestError {
+	if e.Field == "" {
+		return &RequestError{Code: "invalid_json", Message: "the request body must be a JSON object"}
+	}
+	var want string
+	switch e.Type.Kind() {
+	case reflect.String:
+		want = "a string"
+	case reflect.Bool:
+		want = "true or false"
+	case reflect.Int, reflect.Int64:
+		want = "an integer"
+	case reflect.Float64:
+		want = "a number"
+	case reflect.Slice:
+		want = "a list"
+	case reflect.Struct:
+		want = "a list of objects"
+	default:
+		want = "a different type"
+	}
+	return &RequestError{Param: e.Field, Code: "invalid_json", Message: e.Field + " must be " + want}
 }
 
 type wireResponse struct {
