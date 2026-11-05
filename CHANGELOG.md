@@ -4,6 +4,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- `transponder --version` shows the commit and build time, for example `transponder dev (1a2b3c4, 2026-11-04T10:00:00Z)`, and `, modified` when the tree had uncommitted changes.
+
 ## [0.1.3] - 2026-11-05
 
 ### Added
