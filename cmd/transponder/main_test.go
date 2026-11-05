@@ -20,10 +20,10 @@ import (
 )
 
 func TestVersionString(t *testing.T) {
-	vcs := func(kv ...string) *debug.BuildInfo {
+	vcs := func(settings map[string]string) *debug.BuildInfo {
 		info := &debug.BuildInfo{}
-		for i := 0; i < len(kv); i += 2 {
-			info.Settings = append(info.Settings, debug.BuildSetting{Key: kv[i], Value: kv[i+1]})
+		for k, v := range settings {
+			info.Settings = append(info.Settings, debug.BuildSetting{Key: k, Value: v})
 		}
 		return info
 	}
@@ -35,17 +35,17 @@ func TestVersionString(t *testing.T) {
 		ok      bool
 		want    string
 	}{
-		{"full info", "dev", vcs("vcs.revision", rev, "vcs.time", when, "vcs.modified", "false"), true,
+		{"full info", "dev", vcs(map[string]string{"vcs.revision": rev, "vcs.time": when, "vcs.modified": "false"}), true,
 			"transponder dev (1a2b3c4, 2026-11-04T10:00:00Z)"},
-		{"modified tree", "dev", vcs("vcs.revision", rev, "vcs.time", when, "vcs.modified", "true"), true,
+		{"modified tree", "dev", vcs(map[string]string{"vcs.revision": rev, "vcs.time": when, "vcs.modified": "true"}), true,
 			"transponder dev (1a2b3c4, 2026-11-04T10:00:00Z, modified)"},
-		{"short revision is kept", "dev", vcs("vcs.revision", "abc", "vcs.time", when), true,
+		{"short revision is kept", "dev", vcs(map[string]string{"vcs.revision": "abc", "vcs.time": when}), true,
 			"transponder dev (abc, 2026-11-04T10:00:00Z)"},
-		{"no vcs settings", "dev", vcs("GOOS", "linux"), true, "transponder dev"},
-		{"no revision", "dev", vcs("vcs.time", when), true, "transponder dev"},
+		{"no vcs settings", "dev", vcs(map[string]string{"GOOS": "linux"}), true, "transponder dev"},
+		{"no revision", "dev", vcs(map[string]string{"vcs.time": when}), true, "transponder dev"},
 		{"no build info", "dev", nil, false, "transponder dev"},
-		{"ok false ignores info", "dev", vcs("vcs.revision", rev, "vcs.time", when), false, "transponder dev"},
-		{"release version", "v1.2.3", vcs("vcs.revision", rev, "vcs.time", when), true,
+		{"ok false ignores info", "dev", vcs(map[string]string{"vcs.revision": rev, "vcs.time": when}), false, "transponder dev"},
+		{"release version", "v1.2.3", vcs(map[string]string{"vcs.revision": rev, "vcs.time": when}), true,
 			"transponder v1.2.3 (1a2b3c4, 2026-11-04T10:00:00Z)"},
 	}
 	for _, tt := range tests {
