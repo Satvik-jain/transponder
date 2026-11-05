@@ -159,7 +159,7 @@ func buildRouter(cfg *config.Bootstrap, client *http.Client) (*router.Router, er
 		case "openai":
 			prov = openai.New(openai.Options{Name: p.Name, BaseURL: p.BaseURL, APIKey: p.APIKey, Client: client})
 		case "ollama":
-			prov = ollama.New(p.Name, p.BaseURL, client)
+			prov = ollama.New(p.Name, p.BaseURL, p.APIKey, client)
 		case "cloudflare":
 			prov = cloudflare.New(p.Name, p.BaseURL, p.APIKey, client)
 		default:

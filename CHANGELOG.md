@@ -4,6 +4,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- `type: ollama` providers send `api_key` as a bearer token, for Ollama behind an auth proxy or hosted Ollama. Without a key no header is sent.
+
 ## [0.1.3] - 2026-11-05
 
 ### Added
