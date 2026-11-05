@@ -9,6 +9,8 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/raven-clown/transponder/internal/schema"
@@ -111,7 +113,21 @@ func wrongTypeError(e *json.UnmarshalTypeError) *RequestError {
 	default:
 		want = "a different type"
 	}
-	return &RequestError{Param: e.Field, Code: "invalid_json", Message: e.Field + " must be " + want}
+	field := dropIndexes(e.Field)
+	return &RequestError{Param: field, Code: "invalid_json", Message: field + " must be " + want}
+}
+
+// dropIndexes removes numeric path segments, which newer Go versions put in
+// UnmarshalTypeError.Field, so the name is the same on every version.
+func dropIndexes(field string) string {
+	parts := strings.Split(field, ".")
+	kept := parts[:0]
+	for _, p := range parts {
+		if _, err := strconv.Atoi(p); err != nil {
+			kept = append(kept, p)
+		}
+	}
+	return strings.Join(kept, ".")
 }
 
 type wireResponse struct {

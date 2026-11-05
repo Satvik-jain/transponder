@@ -54,6 +54,7 @@ func TestDecodeChatRequestWrongTypes(t *testing.T) {
 		{"messages", `{"model":"m","messages":"hi"}`, "messages", "messages must be a list"},
 		{"message item", `{"model":"m","messages":[1]}`, "messages", "messages must be a list of objects"},
 		{"role", `{"model":"m","messages":[{"role":1,"content":"x"}]}`, "messages.role", "messages.role must be a string"},
+		{"role of a later message", `{"model":"m","messages":[{"role":"user","content":"x"},{"role":1}]}`, "messages.role", "messages.role must be a string"},
 		{"max_tokens string", `{"model":"m","messages":[{"role":"user","content":"x"}],"max_tokens":"10"}`, "max_tokens", "max_tokens must be an integer"},
 		{"max_tokens fraction", `{"model":"m","messages":[{"role":"user","content":"x"}],"max_tokens":1.5}`, "max_tokens", "max_tokens must be an integer"},
 		{"temperature", `{"model":"m","messages":[{"role":"user","content":"x"}],"temperature":"hot"}`, "temperature", "temperature must be a number"},
